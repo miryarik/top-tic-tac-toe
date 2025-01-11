@@ -163,6 +163,7 @@ const Game = (() => {
         // execution reaching here means game didn't end
         return false;
     }
+    
 
     function playTurn(i, j) {
         // mark a cell with appropriate current turn mark
