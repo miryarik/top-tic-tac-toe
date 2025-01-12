@@ -248,3 +248,10 @@ const Game = (() => {
         playTurn,
     };
 })();
+
+
+document.addEventListener("DOMContentLoaded", (event) => {
+    const startDialog = document.querySelector('dialog#start-dialog');
+
+    startDialog.showModal();
+});
