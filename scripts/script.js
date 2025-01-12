@@ -5,10 +5,12 @@ const Game = (() => {
         {
             id: 1,
             mark: "X",
+            winCount: 0,
         },
         {
             id: 2,
             mark: "O",
+            winCount: 0,
         },
     ];
 
@@ -42,7 +44,7 @@ const Game = (() => {
 
     function initPlayers(name1, name2) {
         // make two players
-        // each with a name, mark
+        // each with a name, mark, winCount = 0
         // one random player gets isMyTurn = true
         // other gets isMyTurn = false
         // declare who gets what mark
@@ -52,23 +54,30 @@ const Game = (() => {
             players[0].name = name1;
             players[1].name = name2;
 
-            players.forEach((player) => {
-                player.isMyTurn = false;
-            });
+            players[0].winCount = 0;
+            players[1].winCount = 0;
 
-            randomIdx = Math.floor(Math.random() * 2);
-            players[randomIdx].isMyTurn = true;
-
-            console.log(
-                `${players[0].name} (${players[0].mark}) -- v/s -- ${players[1].name} (${players[1].mark})`
-            );
-
-            console.log(
-                `${players[randomIdx].name} (${players[randomIdx].mark}) plays first`
-            );
+            pickFirstMove();
         } else {
             console.log("Board not initialized");
         }
+    }
+
+    function pickFirstMove() {
+        players.forEach((player) => {
+            player.isMyTurn = false;
+        });
+
+        const randomIdx = Math.floor(Math.random() * 2);
+        players[randomIdx].isMyTurn = true;
+
+        console.log(
+            `${players[0].name} (${players[0].mark}) -- v/s -- ${players[1].name} (${players[1].mark})`
+        );
+
+        console.log(
+            `${players[randomIdx].name} (${players[randomIdx].mark}) plays first`
+        );
     }
 
     function start(name1, name2) {
@@ -85,6 +94,8 @@ const Game = (() => {
     }
 
     function markCell(i, j) {
+        // handle cell mark and return true if it can be marked
+        // if not return false
         // mark the cell as per cooridnates
         // with the mark of the player whose turn it is now
         // atm : board[i][j] is an object cell
@@ -92,6 +103,9 @@ const Game = (() => {
         if (board && board[i][j].mark === "") {
             const turnPlayer = getWhoseTurn();
             board[i][j].mark = turnPlayer.mark;
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -100,9 +114,11 @@ const Game = (() => {
         return players.find((player) => player.isMyTurn);
     }
 
-    function checkGameEnd(i, j) {
+    function handleRoundEnd(i, j) {
+        // return true if round end otherwise false
         // check if the current turn player has won
-        // if yes, declare winner and reset board
+        // if yes, declare winner, increment win counts
+        // and the reset board
         // else check if theres a die
         // if yes declare tie and reset board
 
@@ -143,8 +159,17 @@ const Game = (() => {
 
         if (win) {
             console.log(`${turnPlayer.name} wins!`);
-            board = [];
 
+            // increment win count by 1 for winner
+            // decrement win count by 1 for loser
+            players.forEach((player) => {
+                player.winCount += player === turnPlayer ? 1 : -1;
+                player.winCount = player.winCount < 0 ? 0 : player.winCount;
+                player.winCount = player.winCount > 3 ? 3 : player.winCount;
+            });
+
+            initBoard();
+            pickFirstMove();
             return true;
         } else {
             // if no one has won
@@ -155,7 +180,8 @@ const Game = (() => {
             );
             if (isTie) {
                 console.log(`It's a tie!`);
-                board = [];
+                initBoard();
+                pickFirstMove();
                 return true;
             }
         }
@@ -163,24 +189,47 @@ const Game = (() => {
         // execution reaching here means game didn't end
         return false;
     }
-    
+
+    function checkGameEnd() {
+        // game ends when someone has won 3 in a row
+
+        if (players.find((player) => player.winCount === 3)) {
+            return true;
+        }
+        return false;
+    }
 
     function playTurn(i, j) {
         // mark a cell with appropriate current turn mark
-        // check if this marking resulted in game ending
-        // if it did not end
-        // switch turns
-        // declare whose turn it is
+        // if it was marked
+        //      check if this marking resulted in round end
+        //      if it did handle it
+        //      if not then
+        //          switch turns
+        //          declare whose turn it is
+        //      check if game ended
+        //      if it did
+        //          declare winner and wipe board
 
-        markCell(i, j);
+        if (markCell(i, j)) {
+            let turnPlayer = getWhoseTurn();
 
-        if (!checkGameEnd(i, j)) {
-            players.forEach((player) => {
-                player.isMyTurn = player.isMyTurn ? false : true;
-            });
+            if (!handleRoundEnd(i, j)) {
+                players.forEach((player) => {
+                    player.isMyTurn = player.isMyTurn ? false : true;
+                });
 
-            const turnPlayer = getWhoseTurn();
-            console.log(`${turnPlayer.name}'s (${turnPlayer.mark}) turn`);
+                turnPlayer = getWhoseTurn();
+                console.log(`${turnPlayer.name}'s (${turnPlayer.mark}) turn`);
+            }
+
+            if (checkGameEnd()) {
+                board = [];
+                console.log(`${turnPlayer.name} wins!`);
+                console.log(`Game over`);
+            }
+        } else {
+            console.log("Invalid move. Try again");
         }
     }
 
