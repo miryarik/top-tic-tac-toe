@@ -9,17 +9,14 @@
     <script src="./scripts/script.js" defer></script>
 </head>
 <body>
-    <div class="container">
-    </div>
-
     <dialog id="start-dialog">
-        <div class="form-container">
-            <form autocomplete="off">
+        <form autocomplete="off" method="dialog">
+            <div class="inputs">
                 <input type="text" name="player-1-name" id="player-1-name" placeholder="Player 1 Name">
                 <input type="text" name="player-2-name" id="player-2-name" placeholder="Player 2 Name">
-                <button type="submit" id="start">Start</button>
-            </form>
-        </div>
+            </div>
+            <button type="submit" id="start">Start</button>
+        </form>
     </dialog>
 </body>
 </html>

@@ -18,7 +18,7 @@ const Game = (() => {
         // initialize board as 3 x 3
         // each element is a cell
 
-        let size = 3;
+        const size = 3;
         board = [];
 
         for (let i = 0; i < size; i++) {
@@ -210,6 +210,7 @@ const Game = (() => {
         //      check if game ended
         //      if it did
         //          declare winner and wipe board
+        // render board
 
         if (markCell(i, j)) {
             let turnPlayer = getWhoseTurn();
@@ -231,6 +232,8 @@ const Game = (() => {
         } else {
             console.log("Invalid move. Try again");
         }
+
+        DisplayHandler.renderBoard();
     }
 
     function getBoard() {
@@ -246,12 +249,78 @@ const Game = (() => {
         start,
         getBoard,
         playTurn,
+        getWhoseTurn
     };
 })();
 
 
-document.addEventListener("DOMContentLoaded", (event) => {
-    const startDialog = document.querySelector('dialog#start-dialog');
+const DisplayHandler = (() => {
 
+    const size = 3;
+    
+    function renderBoard() {
+        // render a new board
+        // based on the game state
+        // give each cell click -> playTurn
+        
+
+        // remove any board
+        document.querySelectorAll(".board").forEach(node => node.remove());
+
+        const boardState = Game.getBoard();
+
+        const body = document.querySelector("body");
+        const boardDiv = document.createElement("div");
+        boardDiv.classList.add("board");
+
+        for(let i = 0; i < size; i++) {
+            const rowDiv = document.createElement("div");
+            rowDiv.classList.add(`row-${i}`);
+
+            for(let j = 0; j < size; j++) {
+                // create cell as per cell in board state
+                const cellDiv = document.createElement("div");
+                cellDiv.classList.add(`col-${j}`);
+                cellDiv.classList.add('cell');
+                cellDiv.innerText = boardState[i][j].mark;
+                rowDiv.appendChild(cellDiv);
+
+                // play when cell clicked
+                cellDiv.addEventListener('click', event => {
+                    Game.playTurn(i, j);
+                });
+            }
+
+            boardDiv.appendChild(rowDiv);
+        }
+
+        body.appendChild(boardDiv);
+    }
+
+    return {
+        renderBoard,
+    }
+
+})();
+
+
+
+// on page load
+document.addEventListener("DOMContentLoaded", (event) => {
+    // show start modal with inputs
+    const startDialog = document.querySelector("#start-dialog");
     startDialog.showModal();
+
+    // get names on click and start game
+    const startBtn = startDialog.querySelector("button");
+    startBtn.addEventListener('click', () => {
+        const player1Name = startDialog.querySelector('#player-1-name').value;
+        const player2Name = startDialog.querySelector('#player-2-name').value;
+
+        Game.start(player1Name, player2Name);
+        DisplayHandler.renderBoard();
+        startDialog.close();
+
+    });
+
 });
