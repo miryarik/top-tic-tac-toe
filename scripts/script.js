@@ -257,6 +257,9 @@ const Game = (() => {
 const DisplayHandler = (() => {
 
     const size = 3;
+
+    const circleSVG = document.querySelector("svgs > #svg-circle");
+    const crossSVG = document.querySelector("svgs > #svg-cross");
     
     function renderBoard() {
         // render a new board
@@ -282,7 +285,16 @@ const DisplayHandler = (() => {
                 const cellDiv = document.createElement("div");
                 cellDiv.classList.add(`col-${j}`);
                 cellDiv.classList.add('cell');
-                cellDiv.innerText = boardState[i][j].mark;
+
+                if (boardState[i][j].mark === "O") {
+                    cellDiv.innerHTML = circleSVG.outerHTML;
+                }
+
+
+                if (boardState[i][j].mark === "X") {
+                    cellDiv.innerHTML = crossSVG.outerHTML;
+                }
+
                 rowDiv.appendChild(cellDiv);
 
                 // play when cell clicked

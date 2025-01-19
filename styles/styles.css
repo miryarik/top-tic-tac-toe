@@ -34,8 +34,21 @@ body {
 
             & div {
                 background-color: var(--square-dark);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                & img {
+                    width: 100%;
+                    height: 100%;
+                }   
             }
         }
+    }
+
+    & svgs {
+        position: absolute;
+        visibility: hidden;
     }
 }
 
