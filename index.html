@@ -16,11 +16,20 @@
 
     <dialog id="start-dialog">
         <form autocomplete="off" method="dialog">
-            <div class="inputs">
-                <input type="text" name="player-1-name" id="player-1-name" placeholder="Player 1 Name">
-                <input type="text" name="player-2-name" id="player-2-name" placeholder="Player 2 Name">
+            <div class="inputs-container">
+                    <div class="ipt-1">
+                        <img src="./assets/icons/cross.svg" alt="cross">
+                        <input type="text" name="player-1-name" id="player-1-name" placeholder="Player 1 Name">
+                    </div>
+
+                    <div class="ipt-2">
+                        <input type="text" name="player-2-name" id="player-2-name" placeholder="Player 2 Name">
+                        <img src="./assets/icons/circle.svg" alt="circle">
+                    </div>
             </div>
-            <button type="submit" id="start">Start</button>
+            <div class="start-btn">
+                <button type="submit" id="start">Start</button>
+            </div>
         </form>
     </dialog>
 </body>

@@ -170,7 +170,9 @@ const Game = (() => {
 
             initBoard();
             pickFirstMove();
+            DisplayHandler.renderBoard();
             return true;
+            
         } else {
             // if no one has won
             // it's a tie if every cell of every row is marked
@@ -220,6 +222,8 @@ const Game = (() => {
                     player.isMyTurn = player.isMyTurn ? false : true;
                 });
 
+                DisplayHandler.renderBoard();
+
                 turnPlayer = getWhoseTurn();
                 console.log(`${turnPlayer.name}'s (${turnPlayer.mark}) turn`);
             }
@@ -233,7 +237,6 @@ const Game = (() => {
             console.log("Invalid move. Try again");
         }
 
-        DisplayHandler.renderBoard();
     }
 
     function getBoard() {
@@ -326,8 +329,11 @@ document.addEventListener("DOMContentLoaded", (event) => {
     // get names on click and start game
     const startBtn = startDialog.querySelector("button");
     startBtn.addEventListener('click', () => {
-        const player1Name = startDialog.querySelector('#player-1-name').value;
-        const player2Name = startDialog.querySelector('#player-2-name').value;
+        let player1Name = startDialog.querySelector('#player-1-name').value;
+        let player2Name = startDialog.querySelector('#player-2-name').value;
+
+        player1Name = player1Name ? player1Name : "Player X";
+        player2Name = player2Name ? player2Name : "Player O";
 
         Game.start(player1Name, player2Name);
         DisplayHandler.renderBoard();
