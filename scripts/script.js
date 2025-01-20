@@ -88,6 +88,7 @@ const Game = (() => {
             console.log("Starting Game");
             initBoard();
             initPlayers(name1, name2);
+            DisplayHandler.renderScores(name1, name2);
         } else {
             console.log("Call start with player names");
         }
@@ -171,6 +172,7 @@ const Game = (() => {
             initBoard();
             pickFirstMove();
             DisplayHandler.renderBoard();
+            DisplayHandler.renderScores(players[0].name, players[1].name);
             return true;
             
         } else {
@@ -248,11 +250,27 @@ const Game = (() => {
         }
     }
 
+    function getScores() {
+        // return current player scores
+        
+        if (players) {
+            const scores = players.map(
+                (player) => ({
+                    id : player.id,
+                    winCount : player.winCount
+                })
+            );
+
+            return scores;
+        }
+    }
+
     return {
         start,
         getBoard,
         playTurn,
-        getWhoseTurn
+        getWhoseTurn,
+        getScores
     };
 })();
 
@@ -264,6 +282,7 @@ const DisplayHandler = (() => {
     const circleSVG = document.querySelector("svgs > #svg-circle");
     const crossSVG = document.querySelector("svgs > #svg-cross");
     
+
     function renderBoard() {
         // render a new board
         // based on the game state
@@ -275,7 +294,7 @@ const DisplayHandler = (() => {
 
         const boardState = Game.getBoard();
 
-        const body = document.querySelector("body");
+        const boardContainer = document.querySelector(".board-container");
         const boardDiv = document.createElement("div");
         boardDiv.classList.add("board");
 
@@ -309,11 +328,46 @@ const DisplayHandler = (() => {
             boardDiv.appendChild(rowDiv);
         }
 
-        body.appendChild(boardDiv);
+        boardContainer.appendChild(boardDiv);
     }
+
+
+    function renderScores(player1Name, player2Name) {
+        // render scoreboard contents as per game states
+
+        document.querySelector('#player-1-name').innerText = player1Name;
+        document.querySelector('#player-2-name').innerText = player2Name;
+
+        const player1Score = document.querySelector('#player-1-score');
+        const player2Score = document.querySelector('#player-2-score');
+
+        player1Score.innerHTML = "";
+        player2Score.innerHTML = "";
+
+        const scores = Game.getScores();
+        
+
+        for(let i = 0; i < scores[0].winCount; i++) {
+            const cross = crossSVG.cloneNode();
+            cross.setAttribute('width', '2em');
+            cross.setAttribute('height', '2em');
+            player1Score.appendChild(cross);
+            
+        }
+
+        for(let i = 0; i < scores[1].winCount; i++) {
+            const circle = circleSVG.cloneNode();
+            circle.setAttribute('width', '2em');
+            circle.setAttribute('height', '2em');
+            player2Score.appendChild(circle);
+        }
+
+    }
+
 
     return {
         renderBoard,
+        renderScores
     }
 
 })();

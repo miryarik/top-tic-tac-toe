@@ -26,46 +26,111 @@
 }
 
 body {
-    width: 100vw;
+    width: 100%;
     height: 100vh;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
+    display: grid;
+    grid-template-rows: 200px 1fr;
+    
     background-color: var(--bg-dark);
-    
-    .board {
-        width: var(--board-size);
-        height: var(--board-size);
 
-        display: grid;
-        grid-template-rows: repeat(3, 1fr);
-        gap: 6px;
 
-        background-color: var(--square-dark);
-    
-        & > div {
-            width: 100%;
-            height: 100%;
+    .scoreboard {
+        grid-row: 1;
+
+        width: 100%;
+
+        padding: 20px 30px;
+
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 30px;
+
+        
+        .score-container {
             
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 30px;
+            
+            text-wrap: nowrap;
 
-            & div.cell {
-                background-color: var(--bg-dark);
+            width: 30%;
+            min-width: 350px;
+            height: 50%;
+
+            padding: 20px;
+            
+            border: 4px solid var(--square-dark);
+            border-radius: 12px;
+            
+            color: white;
+            font-size: 2em;
+            font-family: allerregular;
+            
+            #player-1-score,
+            #player-2-score {
+
                 display: flex;
-                justify-content: center;
-                align-items: center;
 
-                & img {
-                    width: 100%;
-                    height: 100%;
-                }   
+                img.svg-mark {
+                    height: 2em;
+                    width: 2em;
+                }
+            }
+
+        }
+
+    }
+
+    .board-container {
+        
+        width: 100%;
+        
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+
+        .board {
+            width: var(--board-size);
+            height: var(--board-size);
+    
+            grid-row: 2;
+    
+            display: grid;
+            grid-template-rows: repeat(3, 1fr);
+            gap: 6px;
+    
+            background-color: var(--square-dark);
+        
+            & > div {
+                width: 100%;
+                height: 100%;
+                
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+    
+                & div.cell {
+                    background-color: var(--bg-dark);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+    
+                    & img {
+                        width: 100%;
+                        height: 100%;
+                    }   
+                }
             }
         }
     }
+    
 
     & svgs {
         position: absolute;
@@ -92,9 +157,8 @@ dialog#start-dialog[open] {
 
     background-color: var(--accent-dark);
 
-    border: 2px solid var(--square-dark);
+    border: 4px solid var(--square-dark);
     border-radius: 16px;
-    box-shadow: 0 0 5px 1px var(--square-dark);
 
     overflow: hidden;
 
@@ -105,12 +169,14 @@ dialog#start-dialog[open] {
         display: grid;
         grid-template-rows: 1fr 100px;
 
+
         & > div.inputs-container {
             width: 100%;
 
             display: grid;
             grid-template-rows: 1fr 1fr;
             align-items: center;
+
 
             & div.ipt-1 {
                 width: 80%;
@@ -185,6 +251,7 @@ dialog#start-dialog[open] {
         & div.start-btn {
             
             padding: 0;
+            
 
             & button {
                 width: 100%;
