@@ -174,7 +174,6 @@ const Game = (() => {
             DisplayHandler.renderBoard();
             DisplayHandler.renderScores(players[0].name, players[1].name);
             return true;
-            
         } else {
             // if no one has won
             // it's a tie if every cell of every row is marked
@@ -238,7 +237,6 @@ const Game = (() => {
         } else {
             console.log("Invalid move. Try again");
         }
-
     }
 
     function getBoard() {
@@ -252,14 +250,12 @@ const Game = (() => {
 
     function getScores() {
         // return current player scores
-        
+
         if (players) {
-            const scores = players.map(
-                (player) => ({
-                    id : player.id,
-                    winCount : player.winCount
-                })
-            );
+            const scores = players.map((player) => ({
+                id: player.id,
+                winCount: player.winCount,
+            }));
 
             return scores;
         }
@@ -270,27 +266,23 @@ const Game = (() => {
         getBoard,
         playTurn,
         getWhoseTurn,
-        getScores
+        getScores,
     };
 })();
 
-
 const DisplayHandler = (() => {
-
     const size = 3;
 
     const circleSVG = document.querySelector("svgs > #svg-circle");
     const crossSVG = document.querySelector("svgs > #svg-cross");
-    
 
     function renderBoard() {
         // render a new board
         // based on the game state
         // give each cell click -> playTurn
-        
 
         // remove any board
-        document.querySelectorAll(".board").forEach(node => node.remove());
+        document.querySelectorAll(".board").forEach((node) => node.remove());
 
         const boardState = Game.getBoard();
 
@@ -298,20 +290,19 @@ const DisplayHandler = (() => {
         const boardDiv = document.createElement("div");
         boardDiv.classList.add("board");
 
-        for(let i = 0; i < size; i++) {
+        for (let i = 0; i < size; i++) {
             const rowDiv = document.createElement("div");
             rowDiv.classList.add(`row-${i}`);
 
-            for(let j = 0; j < size; j++) {
+            for (let j = 0; j < size; j++) {
                 // create cell as per cell in board state
                 const cellDiv = document.createElement("div");
                 cellDiv.classList.add(`col-${j}`);
-                cellDiv.classList.add('cell');
+                cellDiv.classList.add("cell");
 
                 if (boardState[i][j].mark === "O") {
                     cellDiv.innerHTML = circleSVG.outerHTML;
                 }
-
 
                 if (boardState[i][j].mark === "X") {
                     cellDiv.innerHTML = crossSVG.outerHTML;
@@ -320,7 +311,7 @@ const DisplayHandler = (() => {
                 rowDiv.appendChild(cellDiv);
 
                 // play when cell clicked
-                cellDiv.addEventListener('click', event => {
+                cellDiv.addEventListener("click", (event) => {
                     Game.playTurn(i, j);
                 });
             }
@@ -331,48 +322,40 @@ const DisplayHandler = (() => {
         boardContainer.appendChild(boardDiv);
     }
 
-
     function renderScores(player1Name, player2Name) {
         // render scoreboard contents as per game states
 
-        document.querySelector('#player-1-name').innerText = player1Name;
-        document.querySelector('#player-2-name').innerText = player2Name;
+        document.querySelector("#player-1-name").innerText = player1Name;
+        document.querySelector("#player-2-name").innerText = player2Name;
 
-        const player1Score = document.querySelector('#player-1-score');
-        const player2Score = document.querySelector('#player-2-score');
+        const player1Score = document.querySelector("#player-1-score");
+        const player2Score = document.querySelector("#player-2-score");
 
         player1Score.innerHTML = "";
         player2Score.innerHTML = "";
 
         const scores = Game.getScores();
-        
 
-        for(let i = 0; i < scores[0].winCount; i++) {
+        for (let i = 0; i < scores[0].winCount; i++) {
             const cross = crossSVG.cloneNode();
-            cross.setAttribute('width', '2em');
-            cross.setAttribute('height', '2em');
+            cross.setAttribute("width", "2em");
+            cross.setAttribute("height", "2em");
             player1Score.appendChild(cross);
-            
         }
 
-        for(let i = 0; i < scores[1].winCount; i++) {
+        for (let i = 0; i < scores[1].winCount; i++) {
             const circle = circleSVG.cloneNode();
-            circle.setAttribute('width', '2em');
-            circle.setAttribute('height', '2em');
+            circle.setAttribute("width", "2em");
+            circle.setAttribute("height", "2em");
             player2Score.appendChild(circle);
         }
-
     }
-
 
     return {
         renderBoard,
-        renderScores
-    }
-
+        renderScores,
+    };
 })();
-
-
 
 // on page load
 document.addEventListener("DOMContentLoaded", (event) => {
@@ -382,9 +365,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
     // get names on click and start game
     const startBtn = startDialog.querySelector("button");
-    startBtn.addEventListener('click', () => {
-        let player1Name = startDialog.querySelector('#player-1-name').value;
-        let player2Name = startDialog.querySelector('#player-2-name').value;
+    startBtn.addEventListener("click", () => {
+        let player1Name = startDialog.querySelector("#player-1-name").value;
+        let player2Name = startDialog.querySelector("#player-2-name").value;
 
         player1Name = player1Name ? player1Name : "Player X";
         player2Name = player2Name ? player2Name : "Player O";
@@ -392,7 +375,5 @@ document.addEventListener("DOMContentLoaded", (event) => {
         Game.start(player1Name, player2Name);
         DisplayHandler.renderBoard();
         startDialog.close();
-
     });
-
 });
