@@ -88,7 +88,7 @@ const Game = (() => {
             console.log("Starting Game");
             initBoard();
             initPlayers(name1, name2);
-            DisplayHandler.renderScores(name1, name2);
+            DisplayHandler.renderScores();
         } else {
             console.log("Call start with player names");
         }
@@ -160,9 +160,9 @@ const Game = (() => {
 
         if (win) {
             const roundWinner = turnPlayer.name;
-            
+
             DisplayHandler.renderBoard();
-            
+
             // increment win count by 1 for winner
             // decrement win count by 1 for loser
             players.forEach((player) => {
@@ -170,20 +170,16 @@ const Game = (() => {
                 player.winCount = player.winCount < 0 ? 0 : player.winCount;
                 player.winCount = player.winCount > 3 ? 3 : player.winCount;
             });
-            
-            
-            DisplayHandler.renderScores(players[0].name, players[1].name);
-            
-            
+
+            DisplayHandler.renderScores();
+
             // wait 3 seconds before resetting board
             window.setTimeout(() => {
-
                 initBoard();
                 pickFirstMove();
-                DisplayHandler.renderBoard()
+                DisplayHandler.renderBoard();
+            }, 2500);
 
-            }, 3000);
-            
             return true;
         } else {
             // if no one has won
@@ -264,7 +260,7 @@ const Game = (() => {
 
         if (players) {
             const scores = players.map((player) => ({
-                id: player.id,
+                name: player.name,
                 winCount: player.winCount,
             }));
 
@@ -286,7 +282,6 @@ const DisplayHandler = (() => {
 
     const circleSVG = document.querySelector("svgs > #svg-circle");
     const crossSVG = document.querySelector("svgs > #svg-cross");
-
 
     function renderBoard() {
         // render a new board
@@ -334,14 +329,34 @@ const DisplayHandler = (() => {
         boardContainer.appendChild(boardDiv);
 
         handleRoundEnd();
+        handleGameEnd();
     }
 
+    function handleGameEnd() {
+        // replace board with banner
+        // with winner declaration
+
+        const scores = Game.getScores();
+        const winner = scores.find((player) => player.winCount === 3);
+
+        if (winner) {
+            // change scoreboard to banner
+            const board = document.querySelector(".board-container");
+            board.innerHTML = "";
+
+            const banner = document.createElement("div");
+            banner.classList.add("banner");
+
+            banner.innerText = `${winner.name} wins!`;
+
+            board.appendChild(banner);
+        }
+    }
 
     function handleRoundEnd() {
         // check if someone has won
         // remove all cell listeners
-        // by replacing the board with a clone 
-
+        // by replacing the board with a clone
 
         const turnPlayer = Game.getWhoseTurn();
         const boardState = Game.getBoard();
@@ -383,24 +398,21 @@ const DisplayHandler = (() => {
             const clone = boardContainer.cloneNode(true);
             boardContainer.parentNode.replaceChild(clone, boardContainer);
         }
-
     }
 
-
-
-    function renderScores(player1Name, player2Name) {
+    function renderScores() {
         // render scoreboard contents as per game states
 
-        document.querySelector("#player-1-name").innerText = player1Name;
-        document.querySelector("#player-2-name").innerText = player2Name;
+        const scores = Game.getScores();
+
+        document.querySelector("#player-1-name").innerText = scores[0].name;
+        document.querySelector("#player-2-name").innerText = scores[1].name;
 
         const player1Score = document.querySelector("#player-1-score");
         const player2Score = document.querySelector("#player-2-score");
 
         player1Score.innerHTML = "";
         player2Score.innerHTML = "";
-
-        const scores = Game.getScores();
 
         for (let i = 0; i < scores[0].winCount; i++) {
             const cross = crossSVG.cloneNode();
@@ -416,7 +428,6 @@ const DisplayHandler = (() => {
             player2Score.appendChild(circle);
         }
     }
-
 
     return {
         renderBoard,

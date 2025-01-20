@@ -96,6 +96,22 @@ body {
         align-items: center;
 
 
+        .banner {
+            font-family: allerregular;
+            font-size: 6em;
+
+            padding: 30px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            text-align: center;
+
+            color: white;
+        }
+
+
         .board {
             width: var(--board-size);
             height: var(--board-size);
