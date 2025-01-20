@@ -28,8 +28,6 @@ const Game = (() => {
                 board[i].push(cell());
             }
         }
-
-        console.log("Board ready.");
     }
 
     function cell(mark = "") {
@@ -58,8 +56,6 @@ const Game = (() => {
             players[1].winCount = 0;
 
             pickFirstMove();
-        } else {
-            console.log("Board not initialized");
         }
     }
 
@@ -70,14 +66,6 @@ const Game = (() => {
 
         const randomIdx = Math.floor(Math.random() * 2);
         players[randomIdx].isMyTurn = true;
-
-        console.log(
-            `${players[0].name} (${players[0].mark}) -- v/s -- ${players[1].name} (${players[1].mark})`
-        );
-
-        console.log(
-            `${players[randomIdx].name} (${players[randomIdx].mark}) plays first`
-        );
     }
 
     function start(name1, name2) {
@@ -85,12 +73,10 @@ const Game = (() => {
         // sets players
 
         if (name1 && name2) {
-            console.log("Starting Game");
             initBoard();
             initPlayers(name1, name2);
+            DisplayHandler.renderBoard();
             DisplayHandler.renderScores();
-        } else {
-            console.log("Call start with player names");
         }
     }
 
@@ -112,8 +98,22 @@ const Game = (() => {
 
     function getWhoseTurn() {
         // get the player object whose turn it is now
-        return players.find((player) => player.isMyTurn);
+        return players.find(player => player.isMyTurn);
     }
+
+    function safelyGetWhoseTurn() {
+        // to avoid exposing the players
+        const playersCopy = players.map((player) => (
+            {   
+                mark : player.mark,
+                name : player.name,
+                isMyTurn : player.isMyTurn,
+            }
+        ));
+
+        return playersCopy.find(player => player.isMyTurn);
+    }
+
 
     function handleRoundEnd(i, j) {
         // return true if round end otherwise false
@@ -178,6 +178,7 @@ const Game = (() => {
                 initBoard();
                 pickFirstMove();
                 DisplayHandler.renderBoard();
+                DisplayHandler.renderScores();
             }, 2500);
 
             return true;
@@ -189,9 +190,17 @@ const Game = (() => {
                 row.every((cell) => cell.mark !== "")
             );
             if (isTie) {
-                console.log(`It's a tie!`);
-                initBoard();
-                pickFirstMove();
+                DisplayHandler.renderBoard();
+                DisplayHandler.renderScores();
+                
+                // wait 3 seconds before resetting board
+                window.setTimeout(() => {
+                    initBoard();
+                    pickFirstMove();
+                    DisplayHandler.renderBoard();
+                    DisplayHandler.renderScores();
+                }, 2500);
+
                 return true;
             }
         }
@@ -222,8 +231,7 @@ const Game = (() => {
         //          declare winner and wipe board
         // render board
 
-        if (markCell(i, j)) {
-            let turnPlayer = getWhoseTurn();
+        if (markCell(i, j)) {            
 
             if (!handleRoundEnd(i, j)) {
                 players.forEach((player) => {
@@ -231,18 +239,12 @@ const Game = (() => {
                 });
 
                 DisplayHandler.renderBoard();
-
-                turnPlayer = getWhoseTurn();
-                console.log(`${turnPlayer.name}'s (${turnPlayer.mark}) turn`);
+                DisplayHandler.renderScores();
             }
 
             if (checkGameEnd()) {
                 board = [];
-                console.log(`${turnPlayer.name} wins!`);
-                console.log(`Game over`);
             }
-        } else {
-            console.log("Invalid move. Try again");
         }
     }
 
@@ -250,8 +252,6 @@ const Game = (() => {
         // return current board state
         if (board) {
             return board.map((row) => row.map((cell) => ({ ...cell })));
-        } else {
-            console.log("Game has not started");
         }
     }
 
@@ -272,7 +272,7 @@ const Game = (() => {
         start,
         getBoard,
         playTurn,
-        getWhoseTurn,
+        safelyGetWhoseTurn,
         getScores,
     };
 })();
@@ -280,8 +280,8 @@ const Game = (() => {
 const DisplayHandler = (() => {
     const size = 3;
 
-    const circleSVG = document.querySelector("svgs > #svg-circle");
-    const crossSVG = document.querySelector("svgs > #svg-cross");
+    const circleSVG = document.querySelector("dialog .ipt-2 img");
+    const crossSVG = document.querySelector("dialog .ipt-1 img");
 
     function renderBoard() {
         // render a new board
@@ -358,7 +358,7 @@ const DisplayHandler = (() => {
         // remove all cell listeners
         // by replacing the board with a clone
 
-        const turnPlayer = Game.getWhoseTurn();
+        const turnPlayer = Game.safelyGetWhoseTurn();
         const boardState = Game.getBoard();
         let win = false;
 
@@ -416,18 +416,41 @@ const DisplayHandler = (() => {
 
         for (let i = 0; i < scores[0].winCount; i++) {
             const cross = crossSVG.cloneNode();
-            cross.setAttribute("width", "2em");
-            cross.setAttribute("height", "2em");
+            cross.setAttribute("width", "52em");
+            cross.setAttribute("height", "52em");
             player1Score.appendChild(cross);
         }
 
         for (let i = 0; i < scores[1].winCount; i++) {
             const circle = circleSVG.cloneNode();
-            circle.setAttribute("width", "2em");
-            circle.setAttribute("height", "2em");
+            circle.setAttribute("width", "52em");
+            circle.setAttribute("height", "52em");
             player2Score.appendChild(circle);
         }
+
+        highlightTurn();
     }
+
+    function highlightTurn() {
+        // keep the score border for the player
+        // whose turn it is now
+        // remove the other's
+
+        const scoreContainers = document.querySelectorAll('.score-container');
+
+        const turnPlayer = Game.safelyGetWhoseTurn();
+
+        if (turnPlayer.mark === 'X') {
+            scoreContainers[0].classList.add('turn');
+            scoreContainers[1].classList.remove('turn');
+        }
+
+        if (turnPlayer.mark === 'O') {
+            scoreContainers[0].classList.remove('turn');
+            scoreContainers[1].classList.add('turn');
+        }
+    }
+
 
     return {
         renderBoard,
@@ -441,17 +464,27 @@ document.addEventListener("DOMContentLoaded", (event) => {
     const startDialog = document.querySelector("#start-dialog");
     startDialog.showModal();
 
+    function starter(player1Name, player2Name) {
+        // starts game with given or default names
+        const p1Name = player1Name ? player1Name : "Player X";
+        const p2Name = player2Name ? player2Name : "Player O";
+        Game.start(p1Name, p2Name);
+        startDialog.close();
+    }
+
     // get names on click and start game
     const startBtn = startDialog.querySelector("button");
     startBtn.addEventListener("click", () => {
-        let player1Name = startDialog.querySelector("#player-1-name").value;
-        let player2Name = startDialog.querySelector("#player-2-name").value;
+        const player1Name = startDialog.querySelector("#player-1-name").value;
+        const player2Name = startDialog.querySelector("#player-2-name").value;
+        starter(player1Name, player2Name);
+    });
 
-        player1Name = player1Name ? player1Name : "Player X";
-        player2Name = player2Name ? player2Name : "Player O";
-
-        Game.start(player1Name, player2Name);
-        DisplayHandler.renderBoard();
-        startDialog.close();
+    // handling escape on dialog
+    startDialog.addEventListener("keydown", (event) => {
+        if (event.keyCode === 27) {
+            event.preventDefault();
+            starter();
+        }
     });
 });

@@ -65,7 +65,7 @@ body {
 
             padding: 20px;
             
-            border: 4px solid var(--square-dark);
+            border: 2px solid var(--square-dark);
             border-radius: 12px;
             
             color: white;
@@ -83,6 +83,11 @@ body {
                 }
             }
 
+        }
+
+        .score-container.turn {
+            border: 4px solid var(--square-dark);
+            box-shadow: 0 0 10px var(--square-dark);
         }
 
     }
@@ -156,10 +161,6 @@ body {
 
 
 
-
-
-
-
 /* Start dialog */
 
 dialog#start-dialog[open] {
@@ -177,6 +178,12 @@ dialog#start-dialog[open] {
     border-radius: 16px;
 
     overflow: hidden;
+
+
+    &::backdrop {
+        background-color: var(--bg-dark);
+    }
+
 
     & form {
         width: 100%;
