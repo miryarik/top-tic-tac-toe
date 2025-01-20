@@ -159,8 +159,10 @@ const Game = (() => {
         }
 
         if (win) {
-            console.log(`${turnPlayer.name} wins!`);
-
+            const roundWinner = turnPlayer.name;
+            
+            DisplayHandler.renderBoard();
+            
             // increment win count by 1 for winner
             // decrement win count by 1 for loser
             players.forEach((player) => {
@@ -168,11 +170,20 @@ const Game = (() => {
                 player.winCount = player.winCount < 0 ? 0 : player.winCount;
                 player.winCount = player.winCount > 3 ? 3 : player.winCount;
             });
-
-            initBoard();
-            pickFirstMove();
-            DisplayHandler.renderBoard();
+            
+            
             DisplayHandler.renderScores(players[0].name, players[1].name);
+            
+            
+            // wait 3 seconds before resetting board
+            window.setTimeout(() => {
+
+                initBoard();
+                pickFirstMove();
+                DisplayHandler.renderBoard()
+
+            }, 3000);
+            
             return true;
         } else {
             // if no one has won
@@ -276,6 +287,7 @@ const DisplayHandler = (() => {
     const circleSVG = document.querySelector("svgs > #svg-circle");
     const crossSVG = document.querySelector("svgs > #svg-cross");
 
+
     function renderBoard() {
         // render a new board
         // based on the game state
@@ -320,7 +332,61 @@ const DisplayHandler = (() => {
         }
 
         boardContainer.appendChild(boardDiv);
+
+        handleRoundEnd();
     }
+
+
+    function handleRoundEnd() {
+        // check if someone has won
+        // remove all cell listeners
+        // by replacing the board with a clone 
+
+
+        const turnPlayer = Game.getWhoseTurn();
+        const boardState = Game.getBoard();
+        let win = false;
+
+        // 3 ways to win
+        for (let i = 0; i < size; i++) {
+            if (
+                boardState[i][0].mark === boardState[i][1].mark &&
+                boardState[i][1].mark === boardState[i][2].mark &&
+                boardState[i][0].mark !== ""
+            ) {
+                win = true;
+            }
+        }
+
+        for (let j = 0; j < size; j++) {
+            if (
+                boardState[0][j].mark === boardState[1][j].mark &&
+                boardState[1][j].mark === boardState[2][j].mark &&
+                boardState[0][j].mark !== ""
+            ) {
+                win = true;
+            }
+        }
+
+        if (
+            ((boardState[0][0].mark === boardState[1][1].mark &&
+                boardState[1][1].mark === boardState[2][2].mark) ||
+                (boardState[0][2].mark === boardState[1][1].mark &&
+                    boardState[1][1].mark === boardState[2][0].mark)) &&
+            boardState[1][1].mark !== ""
+        ) {
+            win = true;
+        }
+
+        if (win) {
+            const boardContainer = document.querySelector(".board-container");
+            const clone = boardContainer.cloneNode(true);
+            boardContainer.parentNode.replaceChild(clone, boardContainer);
+        }
+
+    }
+
+
 
     function renderScores(player1Name, player2Name) {
         // render scoreboard contents as per game states
@@ -350,6 +416,7 @@ const DisplayHandler = (() => {
             player2Score.appendChild(circle);
         }
     }
+
 
     return {
         renderBoard,
