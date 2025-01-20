@@ -179,7 +179,7 @@ const Game = (() => {
                 pickFirstMove();
                 DisplayHandler.renderBoard();
                 DisplayHandler.renderScores();
-            }, 2500);
+            }, 1800);
 
             return true;
         } else {
@@ -199,7 +199,7 @@ const Game = (() => {
                     pickFirstMove();
                     DisplayHandler.renderBoard();
                     DisplayHandler.renderScores();
-                }, 2500);
+                }, 1800);
 
                 return true;
             }
